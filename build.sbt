@@ -28,6 +28,11 @@ lazy val scalaz = project.in(file("scalaz"))
   .settings(libraryDependencies += "org.scalaz.stream" %% "scalaz-stream" % "0.8.6a")
   .dependsOn(core, core % "test->test")
 
+lazy val userGuide = project.in(file("userguide"))
+  .settings(buildSettings)
+  .settings(userGuidePublishSettings)
+  .dependsOn(core, lib, scalaz)
+
 def moduleSettings(moduleName: String) = Seq(
   organization := "org.atnos",
   name := "origami-"+moduleName
@@ -82,6 +87,11 @@ lazy val sharedPublishSettings = Seq(
   pomIncludeRepository := Function.const(false),
   publishTo := Option("Releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
   sonatypeProfileName := "org.atnos"
+)
+
+lazy val userGuidePublishSettings = Seq(
+  publishMavenStyle := false,
+  publishTo := None
 ) ++ site.settings ++
   ghpages.settings ++
   userGuideSettings
@@ -111,3 +121,8 @@ lazy val prompt = shellPrompt in ThisBuild := { state =>
   val name = Project.extract(state).currentRef.project
   (if (name == "origami") "" else name) + "> "
 }
+
+
+scalacOptions in (Compile, console) ~= (_.filterNot(Set(
+  "-Xfatal-warnings"
+)))
